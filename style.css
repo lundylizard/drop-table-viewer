@@ -1,0 +1,67 @@
+
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #121212;
+      color: #e0e0e0;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    input[type="file"] {
+      background: #1e1e1e;
+      color: #fff;
+      padding: 10px;
+      border: none;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+    input[type="search"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      background: #222;
+      color: #fff;
+      border: 1px solid #444;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid #333;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #333;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+    #dropsTable tbody tr.even {
+      background-color: #1e1e1e;
+    }
+    #dropsTable tbody tr.odd {
+      background-color: #2a2a2a;
+    }
+    th.sorted-asc::after {
+      content: ' ▲';
+    }
+    th.sorted-desc::after {
+      content: ' ▼';
+    }
+    .opponent-cell img {
+      width: 24px;
+      height: 24px;
+      vertical-align: middle;
+      margin-right: 8px;
+      border-radius: 4px;
+    }
+  

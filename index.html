@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Drop Table Viewer</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="img/7.png">
+  
+</head>
+<body>
+  <div class="container">
+    <input type="file" id="logFile" />
+    <div id="searchView" class="hidden">
+      <input type="search" id="search" placeholder="Search drops..." />
+    </div>
+    <table id="dropsTable">
+      <thead>
+        <tr>
+          <th data-key="id">ID</th>
+          <th data-key="card">Card</th>
+          <th data-key="rate">Rate</th>
+          <th data-key="opponent">Opponent</th>
+          <th data-key="strategy">Strategy</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
