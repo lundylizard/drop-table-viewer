@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Drop Table Viewer</title>
+  <title>[FM] Drop Table Viewer</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="img/7.png">
   
 </head>
 <body>
@@ -12,6 +11,12 @@
     <input type="file" id="logFile" />
     <div id="searchView" class="hidden">
       <input type="search" id="search" placeholder="Search drops..." />
+      <div class="filters">
+        <input type="number" id="minRate" placeholder="Min Rate (1)" min="1" max="2048">
+        <input type="number" id="maxRate" placeholder="Max Rate (2048)" min="1" max="2048">
+        <select id="filterOpponent"><option value="">All Opponents</option></select>
+        <select id="filterStrategy"><option value="">All Strategies</option></select>
+      </div>
     </div>
     <table id="dropsTable">
       <thead>
