@@ -104,6 +104,30 @@ function populateFilters(data) {
 
 function populateTypeFilter() {
   typeFilterContainer.innerHTML = '';
+
+  const controls = document.createElement('div');
+  controls.className = 'type-controls';
+
+  const selectAll = document.createElement('button');
+  selectAll.textContent = 'Select All';
+  selectAll.type = 'button';
+  selectAll.addEventListener('click', () => {
+    typeFilterContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+    applySortAndFilter();
+  });
+
+  const deselectAll = document.createElement('button');
+  deselectAll.textContent = 'Deselect All';
+  deselectAll.type = 'button';
+  deselectAll.addEventListener('click', () => {
+    typeFilterContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+    applySortAndFilter();
+  });
+
+  controls.appendChild(selectAll);
+  controls.appendChild(deselectAll);
+  typeFilterContainer.appendChild(controls);
+
   cardTypes.forEach((type, idx) => {
     const label = document.createElement('label');
     const checkbox = document.createElement('input');
@@ -114,9 +138,11 @@ function populateTypeFilter() {
     label.append(checkbox, document.createTextNode(type));
     typeFilterContainer.appendChild(label);
   });
+
   typeFilterContainer.classList.add('hidden');
   typeArrow.textContent = '▼';
 }
+
 
 function renderTable(data) {
   tableBody.innerHTML = '';
