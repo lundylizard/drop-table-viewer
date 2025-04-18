@@ -1,28 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>[FM] Drop Table Viewer</title>
-  <link rel="stylesheet" href="style.css">
-  
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <input type="file" id="logFile" />
+    <div class="file-upload-row">
+      <input type="file" id="logFile" />
+    </div>
+
     <div id="searchView" class="hidden">
-      <input type="search" id="search" placeholder="Search drops..." />
+      <div class="search-bar-row">
+        <input type="search" id="search" placeholder="Search drops..." />
+        
+        <div class="type-filter-dropdown">
+          <button id="toggleTypeDropdown" type="button">
+            Filter Types <span id="typeArrow">▼</span>
+          </button>
+          <div id="typeCheckboxes" class="hidden"></div>
+        </div>
+      </div>
+
       <div class="filters">
-        <input type="number" id="minRate" placeholder="Min Rate (1)" min="1" max="2048">
-        <input type="number" id="maxRate" placeholder="Max Rate (2048)" min="1" max="2048">
-        <select id="filterOpponent"><option value="">All Opponents</option></select>
-        <select id="filterStrategy"><option value="">All Strategies</option></select>
+        <input type="number" id="minRate" placeholder="Min Rate (1)" min="1" max="2048" />
+        <input type="number" id="maxRate" placeholder="Max Rate (2048)" min="1" max="2048" />
+        
+        <select id="filterOpponent">
+          <option value="">All Opponents</option>
+        </select>
+
+        <div id="filterStrategy" class="strategy-checkboxes"></div>
       </div>
     </div>
+
     <table id="dropsTable">
       <thead>
         <tr>
-          <th data-key="id">ID</th>
           <th data-key="card">Card</th>
+          <th data-key="type">Type</th>
           <th data-key="rate">Rate</th>
           <th data-key="opponent">Opponent</th>
           <th data-key="strategy">Strategy</th>
@@ -31,6 +48,7 @@
       <tbody></tbody>
     </table>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>

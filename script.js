@@ -1,141 +1,220 @@
 const fileInput = document.getElementById('logFile');
-    const tableBody = document.querySelector('#dropsTable tbody');
-    const searchView = document.getElementById('searchView');
-    const searchInput = document.getElementById('search');
-    const minRateInput = document.getElementById('minRate');
-    const maxRateInput = document.getElementById('maxRate');
-    const filterOpponent = document.getElementById('filterOpponent');
-    const filterStrategy = document.getElementById('filterStrategy');
+const tableBody = document.querySelector('#dropsTable tbody');
+const searchView = document.getElementById('searchView');
+const searchInput = document.getElementById('search');
+const minRateInput = document.getElementById('minRate');
+const maxRateInput = document.getElementById('maxRate');
+const filterOpponent = document.getElementById('filterOpponent');
+const filterStrategy = document.getElementById('filterStrategy');
+const typeFilterContainer = document.getElementById('typeCheckboxes');
+const toggleTypeDropdown = document.getElementById('toggleTypeDropdown');
+const typeArrow = document.getElementById('typeArrow');
 
-    let currentSortKey = null;
-    let currentSortDirection = 'asc';
-    let currentData = [];
-    const imageCache = {};
-    const opponentImageMap = {};
-    let nextImageId = 1;
+let currentSortKey = null;
+let currentSortDirection = 'asc';
+let currentData = [];
+let typeMapping = {};
+const opponentImageMap = {};
+let nextImageId = 1;
 
-    fileInput.addEventListener('change', async (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const text = await file.text();
-      const parsed = parseDropData(text);
-      currentData = parsed;
-      populateFilters(parsed);
-      applySortAndFilter();
-      searchView.classList.remove('hidden');
-    });
+const cardTypes = [
+  "Dragon",
+  "Spellcaster",
+  "Zombie",
+  "Warrior",
+  "Beast-Warrior",
+  "Beast",
+  "Winged Beast",
+  "Fiend",
+  "Fairy",
+  "Insect",
+  "Dinosaur",
+  "Reptile",
+  "Fish",
+  "Sea Serpent",
+  "Machine",
+  "Thunder",
+  "Aqua",
+  "Pyro",
+  "Rock",
+  "Plant",
+  "Magic",
+  "Trap",
+  "Ritual",
+  "Equip"
+];
 
-    function populateFilters(data) {
-      const opponents = [...new Set(data.map(d => d.opponent))];
-      const strategies = [...new Set(data.map(d => d.strategy))].sort();
+async function loadTypeMapping() {
+  const res = await fetch('assets/types.json');
+  typeMapping = await res.json();
+}
 
-      filterOpponent.innerHTML = '<option value="">All Opponents</option>' + opponents.map(o => `<option>${o}</option>`).join('');
-      filterStrategy.innerHTML = '<option value="">All Strategies</option>' + strategies.map(s => `<option>${s}</option>`).join('');
-    }
+function parseDropData(text) {
+  const lines = text.split('\n');
+  const drops = [];
+  let currentOpponent = '', currentStrategy = '';
 
-    function parseDropData(text) {
-      const lines = text.split('\n');
-      const drops = [];
-      let currentOpponent = '';
-      let currentStrategy = '';
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    const headerMatch = line.match(/^(.+?)\s+(S\/A)-(Tec|Pow) drops$/i) || line.match(/^(.+?)\s+(B\/C\/D) drops$/i);
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        const headerMatch = line.match(/^(.+?)\s+(S\/A)-(Tec|Pow) drops$/i) || line.match(/^(.+?)\s+(B\/C\/D) drops$/i);
-        if (headerMatch) {
-          currentOpponent = headerMatch[1].trim();
-          currentStrategy = headerMatch[2].toUpperCase();
-          if (currentStrategy === 'S/A') {
-            currentStrategy += ' ' + headerMatch[3].toUpperCase();
-          }
-          if (!(currentOpponent in opponentImageMap)) {
-            opponentImageMap[currentOpponent] = nextImageId++;
-          }
-        } else if (line.startsWith('=>')) {
-          const cardMatch = line.match(/=> #(\d+) (.+)/);
-          const rateLine = lines[i + 1]?.trim();
-          const rateMatch = rateLine.match(/^Rate:\s+(\d+\/2048)/);
-          if (cardMatch && rateMatch) {
-            const id = cardMatch[1];
-            const card = cardMatch[2];
-            const rate = rateMatch[1];
-            const imageId = opponentImageMap[currentOpponent] || 0;
-            drops.push({ id, card, rate, opponent: currentOpponent, strategy: currentStrategy, imageId });
-          }
-        }
+    if (headerMatch) {
+      currentOpponent = headerMatch[1].trim();
+      currentStrategy = headerMatch[2].toUpperCase();
+      if (currentStrategy === 'S/A') currentStrategy += ' ' + headerMatch[3].toUpperCase();
+      if (!(currentOpponent in opponentImageMap)) opponentImageMap[currentOpponent] = nextImageId++;
+    } else if (line.startsWith('=>')) {
+      const cardMatch = line.match(/=> #(\d+) (.+)/);
+      const rateLine = lines[i + 1]?.trim();
+      const rateMatch = rateLine?.match(/^Rate:\s+(\d+\/2048)/);
+
+      if (cardMatch && rateMatch) {
+        const id = cardMatch[1], card = cardMatch[2], rate = rateMatch[1];
+        const imageId = opponentImageMap[currentOpponent] || 0;
+        const typeIndex = typeMapping[id] ?? -1;
+        drops.push({ id, card, rate, opponent: currentOpponent, strategy: currentStrategy, imageId, typeIndex });
       }
-      return drops;
     }
+  }
 
-    function renderTable(data) {
-      tableBody.innerHTML = '';
-      data.forEach((drop, index) => {
-        const row = document.createElement('tr');
-        row.className = index % 2 === 0 ? 'even' : 'odd';
-        const imgSrc = `img/${drop.imageId}.png`;
-        row.innerHTML = `
-          <td>${drop.id}</td>
-          <td>${drop.card}</td>
-          <td>${drop.rate}</td>
-          <td class="opponent-cell">
-            <img src="${imgSrc}" alt="Opponent Icon">
-            ${drop.opponent}
-          </td>
-          <td>${drop.strategy}</td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
+  return drops;
+}
 
-    [searchInput, minRateInput, maxRateInput, filterOpponent, filterStrategy].forEach(el => {
-      el.addEventListener('input', applySortAndFilter);
-    });
+function populateFilters(data) {
+  const opponents = [...new Set(data.map(d => d.opponent))];
+  const strategies = [...new Set(data.map(d => d.strategy))].sort();
 
-    function applySortAndFilter() {
-      const textFilter = searchInput.value.toLowerCase();
-      const minRate = parseInt(minRateInput.value) || 1;
-      const maxRate = parseInt(maxRateInput.value) || 2048;
-      const opponentVal = filterOpponent.value;
-      const strategyVal = filterStrategy.value;
+  filterOpponent.innerHTML = `
+    <option value="">All Opponents</option>
+    ${opponents.map(op => `<option>${op}</option>`).join('')}
+  `;
 
-      let filtered = currentData.filter(drop => {
-        const cardMatch = drop.card.toLowerCase().includes(textFilter);
-        const rateValue = parseInt(drop.rate.split('/')[0]);
-        const rateMatch = rateValue >= minRate && rateValue <= maxRate;
-        const opponentMatch = opponentVal ? drop.opponent === opponentVal : true;
-        const strategyMatch = strategyVal ? drop.strategy === strategyVal : true;
-        return cardMatch && rateMatch && opponentMatch && strategyMatch;
-      });
+  filterStrategy.innerHTML = '';
+  strategies.forEach(strat => {
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = strat;
+    checkbox.checked = true;
+    checkbox.addEventListener('change', applySortAndFilter);
+    label.append(checkbox, document.createTextNode(strat));
+    filterStrategy.appendChild(label);
+  });
+}
 
-      if (currentSortKey) {
-        filtered.sort((a, b) => {
-          let aVal = a[currentSortKey];
-          let bVal = b[currentSortKey];
-          if (currentSortKey === 'rate') {
-            aVal = parseInt(aVal.split('/')[0]);
-            bVal = parseInt(bVal.split('/')[0]);
-          }
-          if (aVal < bVal) return currentSortDirection === 'asc' ? -1 : 1;
-          if (aVal > bVal) return currentSortDirection === 'asc' ? 1 : -1;
-          return 0;
-        });
+function populateTypeFilter() {
+  typeFilterContainer.innerHTML = '';
+  cardTypes.forEach((type, idx) => {
+    const label = document.createElement('label');
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.value = idx;
+    checkbox.checked = true;
+    checkbox.addEventListener('change', applySortAndFilter);
+    label.append(checkbox, document.createTextNode(type));
+    typeFilterContainer.appendChild(label);
+  });
+  typeFilterContainer.classList.add('hidden');
+  typeArrow.textContent = '▼';
+}
+
+function renderTable(data) {
+  tableBody.innerHTML = '';
+  data.forEach((drop, i) => {
+    const rateValue = parseInt(drop.rate.split('/')[0], 10);
+    const percentage = ((rateValue / 2048) * 100).toFixed(1);
+    const imgSrc = `assets/opponent/${drop.imageId}.png`;
+    const row = document.createElement('tr');
+    row.className = i % 2 === 0 ? 'even' : 'odd';
+    row.innerHTML = `
+      <td>${drop.card}</td>
+      <td>${cardTypes[drop.typeIndex] || 'Unknown'}</td>
+      <td>${drop.rate} <strong>(${percentage}%)</strong></td>
+      <td class="opponent-cell">
+        <img src="${imgSrc}" alt="Opponent Icon">${drop.opponent}
+      </td>
+      <td>${drop.strategy}</td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+function applySortAndFilter() {
+  const textFilter = searchInput.value.toLowerCase();
+  const minRate = parseInt(minRateInput.value, 10) || 1;
+  const maxRate = parseInt(maxRateInput.value, 10) || 2048;
+  const opponentVal = filterOpponent.value;
+  const checkedStrats = [...filterStrategy.querySelectorAll('input:checked')].map(cb => cb.value);
+  const checkedTypes = [...typeFilterContainer.querySelectorAll('input:checked')].map(cb => +cb.value);
+
+  let filtered = currentData.filter(drop => {
+    const rateNum = parseInt(drop.rate.split('/')[0], 10);
+    return drop.card.toLowerCase().includes(textFilter) &&
+      rateNum >= minRate && rateNum <= maxRate &&
+      (opponentVal ? drop.opponent === opponentVal : true) &&
+      checkedStrats.includes(drop.strategy) &&
+      checkedTypes.includes(drop.typeIndex);
+  });
+
+  if (currentSortKey) {
+    filtered.sort((a, b) => {
+      let aVal = a[currentSortKey], bVal = b[currentSortKey];
+      if (currentSortKey === 'rate') {
+        aVal = parseInt(aVal.split('/')[0], 10);
+        bVal = parseInt(bVal.split('/')[0], 10);
       }
-      renderTable(filtered);
-    }
-
-    document.querySelectorAll('#dropsTable th').forEach(header => {
-      header.addEventListener('click', () => {
-        const key = header.getAttribute('data-key');
-        if (currentSortKey === key) {
-          currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-        } else {
-          currentSortKey = key;
-          currentSortDirection = 'asc';
-        }
-        document.querySelectorAll('#dropsTable th').forEach(h => {
-          h.classList.remove('sorted-asc', 'sorted-desc');
-        });
-        header.classList.add(`sorted-${currentSortDirection}`);
-        applySortAndFilter();
-      });
+      return currentSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
     });
+  }
+
+  renderTable(filtered);
+}
+
+fileInput.addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  await loadTypeMapping();
+  const text = await file.text();
+  currentData = parseDropData(text);
+  populateFilters(currentData);
+  applySortAndFilter();
+  searchView.classList.remove('hidden');
+});
+
+[searchInput, minRateInput, maxRateInput, filterOpponent].forEach(el =>
+  el.addEventListener('input', applySortAndFilter)
+);
+
+document.querySelectorAll('#dropsTable th').forEach(header => {
+  header.addEventListener('click', () => {
+    const key = header.dataset.key;
+    if (currentSortKey === key) {
+      currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      currentSortKey = key;
+      currentSortDirection = 'asc';
+    }
+    document.querySelectorAll('#dropsTable th').forEach(h =>
+      h.classList.remove('sorted-asc', 'sorted-desc')
+    );
+    header.classList.add(`sorted-${currentSortDirection}`);
+    applySortAndFilter();
+  });
+});
+
+toggleTypeDropdown.addEventListener('click', e => {
+  e.stopPropagation();
+  const isHidden = typeFilterContainer.classList.toggle('hidden');
+  typeArrow.textContent = isHidden ? '▼' : '▲';
+});
+
+document.addEventListener('click', e => {
+  if (!typeFilterContainer.contains(e.target) && !toggleTypeDropdown.contains(e.target)) {
+    if (!typeFilterContainer.classList.contains('hidden')) {
+      typeFilterContainer.classList.add('hidden');
+      typeArrow.textContent = '▼';
+    }
+  }
+});
+
+window.addEventListener('DOMContentLoaded', populateTypeFilter);

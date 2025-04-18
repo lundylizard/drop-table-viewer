@@ -1,57 +1,174 @@
+/* Base styles */
 body {
   margin: 0;
   font-family: sans-serif;
   background: #121212;
   color: #e0e0e0;
 }
+
+/* Layout container */
 .container {
   max-width: 900px;
   margin: auto;
   padding: 20px;
 }
-input, select {
+
+/* Form controls */
+input,
+select {
   background: #1e1e1e;
   color: #fff;
   padding: 10px;
   border: none;
   margin-bottom: 2px;
 }
+
 input[type="search"] {
   width: 100%;
   margin: 10px 0;
   background: #222;
   border: 1px solid #444;
 }
+
+/* Upload row */
+.file-upload-row {
+  margin-bottom: 10px;
+}
+
+/* Search bar */
+.search-bar-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.search-bar-row input[type="search"] {
+  flex: 1;
+  margin: 0;
+}
+
+/* Filter section */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.filters > * {
+  flex: none;
+}
+
+/* Strategy checkboxes */
+.strategy-checkboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  flex: 2;
+}
+
+.strategy-checkboxes label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Rate input widths */
+#minRate,
+#maxRate {
+  width: 150px; /* Adjust to 80px for tighter layout */
+  flex: none;
+}
+
+/* Dropdown styles */
+.type-filter-dropdown {
+  position: relative;
+}
+
+.type-filter-dropdown button {
+  padding: 10px;
+  background: #2a2a2a;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.type-filter-dropdown button:hover {
+  background: #444;
+}
+
+#typeArrow {
+  font-size: 0.9em;
+}
+
+#typeCheckboxes {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #1e1e1e;
+  padding: 10px;
+  border: 1px solid #444;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+}
+
+#typeCheckboxes.hidden {
+  display: none;
+}
+
+#typeCheckboxes label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 5px;
+}
+
+/* Table styles */
 table {
   width: 100%;
   border-collapse: collapse;
 }
+
 table, th, td {
   border: 1px solid black;
 }
+
 th, td {
-  padding: 8px;
+  padding: 6px;
   text-align: left;
 }
+
 th {
   background: #333;
   cursor: pointer;
 }
-.hidden {
-  display: none;
-}
-#dropsTable tbody tr.even {
-  background-color: #1e1e1e;
-}
-#dropsTable tbody tr.odd {
-  background-color: #2a2a2a;
-}
+
 th.sorted-asc::after {
   content: ' ▲';
 }
+
 th.sorted-desc::after {
   content: ' ▼';
 }
+
+/* Table row striping */
+#dropsTable tbody tr.even {
+  background-color: #1e1e1e;
+}
+
+#dropsTable tbody tr.odd {
+  background-color: #2a2a2a;
+}
+
+/* Opponent image in table */
 .opponent-cell img {
   width: 24px;
   height: 24px;
@@ -59,12 +176,8 @@ th.sorted-desc::after {
   margin-right: 2px;
   border-radius: 4px;
 }
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.filters > * {
-  flex: 1;
+
+/* Utility */
+.hidden {
+  display: none;
 }
