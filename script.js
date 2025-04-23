@@ -207,6 +207,38 @@ fileInput.addEventListener('change', async e => {
   searchView.classList.remove('hidden');
 });
 
+document.getElementById('loadVanilla').addEventListener('click', async () => {
+  await loadTypeMapping();
+  const res = await fetch('assets/vanilla.log');
+  const text = await res.text();
+  currentData = parseDropData(text);
+  populateFilters(currentData);
+  applySortAndFilter();
+  searchView.classList.remove('hidden');
+});
+
+document.getElementById('resetApp').addEventListener('click', () => {
+  currentData = [];
+  tableBody.innerHTML = '';
+
+  fileInput.value = '';
+  searchInput.value = '';
+  minRateInput.value = '';
+  maxRateInput.value = '';
+  filterOpponent.value = '';
+  filterStrategy.innerHTML = '';
+
+  typeFilterContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = true);
+
+  currentSortKey = null;
+  currentSortDirection = 'asc';
+  document.querySelectorAll('#dropsTable th').forEach(h =>
+    h.classList.remove('sorted-asc', 'sorted-desc')
+  );
+
+  searchView.classList.add('hidden');
+});
+
 [searchInput, minRateInput, maxRateInput, filterOpponent].forEach(el =>
   el.addEventListener('input', applySortAndFilter)
 );
