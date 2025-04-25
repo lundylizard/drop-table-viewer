@@ -150,11 +150,16 @@ function renderTable(data) {
     const rateValue = parseInt(drop.rate.split('/')[0], 10);
     const percentage = ((rateValue / 2048) * 100).toFixed(1);
     const imgSrc = `assets/opponent/${drop.imageId}.png`;
+    const typeName = cardTypes[drop.typeIndex] || 'Unknown';
+    const typeImgSrc = `assets/types/${typeName}.png`;
     const row = document.createElement('tr');
     row.className = i % 2 === 0 ? 'even' : 'odd';
     row.innerHTML = `
       <td>${drop.card}</td>
-      <td>${cardTypes[drop.typeIndex] || 'Unknown'}</td>
+      <td>
+        <img src="${typeImgSrc}" alt="${typeName}" class="type-icon" />
+        ${typeName}
+      </td>
       <td>${drop.rate} <strong>(${percentage}%)</strong></td>
       <td class="opponent-cell">
         <img src="${imgSrc}" alt="Opponent Icon">${drop.opponent}
