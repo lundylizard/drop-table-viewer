@@ -182,7 +182,16 @@ function renderTable(data) {
 }
 
 function applySortAndFilter() {
-  const textFilter = searchInput.value.toLowerCase();
+  const rawSearch = searchInput.value.trim().toLowerCase();
+  let searchById = null;
+
+  if (rawSearch.startsWith('#')) {
+    const idMatch = rawSearch.match(/^#(\d+)$/);
+    if (idMatch) {
+      searchById = idMatch[1];
+    }
+  }
+
   const minRate = parseInt(minRateInput.value, 10) || 1;
   const maxRate = parseInt(maxRateInput.value, 10) || 2048;
   const opponentVal = filterOpponent.value;
@@ -191,12 +200,14 @@ function applySortAndFilter() {
 
   let filtered = currentData.filter(drop => {
     const rateNum = parseInt(drop.rate.split('/')[0], 10);
-    return drop.card.toLowerCase().includes(textFilter) &&
+    return (
+      (searchById ? drop.id === searchById : drop.card.toLowerCase().includes(rawSearch)) &&
       rateNum >= minRate && rateNum <= maxRate &&
       (opponentVal ? drop.opponent === opponentVal : true) &&
       checkedStrats.includes(drop.strategy) &&
-      checkedTypes.includes(drop.typeIndex);
-  });
+      checkedTypes.includes(drop.typeIndex)
+    );
+  });  
 
   if (currentSortKey) {
     filtered.sort((a, b) => {
