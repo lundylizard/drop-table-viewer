@@ -45,6 +45,14 @@ const cardTypes = [
   "Equip"
 ];
 
+function debounce(fn, delay = 200) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
+}
+
 async function loadTypeMapping() {
   const res = await fetch('assets/types.json');
   typeMapping = await res.json();
@@ -146,29 +154,31 @@ function populateTypeFilter() {
 
 
 function renderTable(data) {
-  tableBody.innerHTML = '';
-  data.forEach((drop, i) => {
+  const limit = (data.length > 500) ? 500 : data.length;
+  const visibleData = data.slice(0, limit);
+  document.getElementById('cardCount').textContent = `Showing ${visibleData.length} cards of ${data.length}`;
+
+  let html = '';
+  for (let i = 0; i < visibleData.length; i++) {
+    const drop = visibleData[i];
     const rateValue = parseInt(drop.rate.split('/')[0], 10);
     const percentage = ((rateValue / 2048) * 100).toFixed(2);
     const imgSrc = `assets/opponent/${drop.imageId}.png`;
     const typeName = cardTypes[drop.typeIndex] || 'Unknown';
     const typeImgSrc = `assets/types/${typeName}.png`;
-    const row = document.createElement('tr');
-    row.className = i % 2 === 0 ? 'even' : 'odd';
-    row.innerHTML = `
-      <td>${drop.card}</td>
-      <td>
-        <img src="${typeImgSrc}" alt="${typeName}" class="type-icon" />
-        ${typeName}
-      </td>
-      <td>${drop.rate} <strong>(${percentage}%)</strong></td>
-      <td class="opponent-cell">
-        <img src="${imgSrc}" alt="Opponent Icon">${drop.opponent}
-      </td>
-      <td>${drop.strategy}</td>
-    `;
-    tableBody.appendChild(row);
-  });
+    const rowClass = i % 2 === 0 ? 'even' : 'odd';
+
+    html += `
+      <tr class="${rowClass}">
+        <td>${drop.card}</td>
+        <td><img src="${typeImgSrc}" alt="${typeName}" class="type-icon" /> ${typeName}</td>
+        <td>${drop.rate} <strong>(${percentage}%)</strong></td>
+        <td class="opponent-cell"><img src="${imgSrc}" alt="Opponent Icon">${drop.opponent}</td>
+        <td>${drop.strategy}</td>
+      </tr>`;
+  }
+
+  tableBody.innerHTML = html;
 }
 
 function applySortAndFilter() {
@@ -258,8 +268,9 @@ document.getElementById('resetApp').addEventListener('click', () => {
   searchView.classList.add('hidden');
 });
 
+const debouncedFilter = debounce(applySortAndFilter, 50);
 [searchInput, minRateInput, maxRateInput, filterOpponent].forEach(el =>
-  el.addEventListener('input', applySortAndFilter)
+  el.addEventListener('input', debouncedFilter)
 );
 
 document.querySelectorAll('#dropsTable th').forEach(header => {
