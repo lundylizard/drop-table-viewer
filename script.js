@@ -189,7 +189,6 @@ function applySortAndFilter() {
   const checkedStrats = [...filterStrategy.querySelectorAll('input:checked')].map(cb => cb.value);
   const checkedTypes = [...typeFilterContainer.querySelectorAll('input:checked')].map(cb => +cb.value);
 
-  // Always start by filtering from currentData (not originalData)
   let filtered = currentData.filter(drop => {
     const rateNum = parseInt(drop.rate.split('/')[0], 10);
     return drop.card.toLowerCase().includes(textFilter) &&
@@ -199,25 +198,29 @@ function applySortAndFilter() {
       checkedTypes.includes(drop.typeIndex);
   });
 
-  // Apply sort if needed
   if (currentSortKey) {
     filtered.sort((a, b) => {
       let aVal = a[currentSortKey];
       let bVal = b[currentSortKey];
-
+  
       if (currentSortKey === 'rate') {
         aVal = parseInt(aVal.split('/')[0], 10);
         bVal = parseInt(bVal.split('/')[0], 10);
-      } else {
+      } else if (currentSortKey === 'type') {
+        aVal = cardTypes[a.typeIndex] || '';
+        bVal = cardTypes[b.typeIndex] || '';
+      }
+  
+      if (currentSortKey !== 'rate') {
         aVal = aVal.toString().toLowerCase();
         bVal = bVal.toString().toLowerCase();
       }
-
+  
       if (aVal < bVal) return currentSortDirection === 'asc' ? -1 : 1;
       if (aVal > bVal) return currentSortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-  }
+  }  
 
   renderTable(filtered);
 }

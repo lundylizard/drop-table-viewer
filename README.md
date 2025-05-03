@@ -20,9 +20,7 @@ Upload a `.log` file or load the vanilla drops to explore rates, types, strategi
 ## 🎮 About
 
 This tool was developed by **lundylizard** to help players and randomizer fans easily browse and understand **card drop** data from the **FMRandomizer** for *Yu-Gi-Oh! Forbidden Memories*.  
-
-Development was guided by feedback and suggestions from members of the community, including but not limited to:  
-**Dr. Wurstpeter**, **Flopsie_Wopsie**, **gui93**, **Brenttro**, and **JohnEBoy**.
+Development was guided by feedback and suggestions from members of the community.
 
 ---
 
