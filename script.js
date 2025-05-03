@@ -13,6 +13,7 @@ const typeArrow = document.getElementById('typeArrow');
 let currentSortKey = null;
 let currentSortDirection = 'asc';
 let currentData = [];
+let originalData = [];
 let typeMapping = {};
 const opponentImageMap = {};
 let nextImageId = 1;
@@ -148,7 +149,7 @@ function renderTable(data) {
   tableBody.innerHTML = '';
   data.forEach((drop, i) => {
     const rateValue = parseInt(drop.rate.split('/')[0], 10);
-    const percentage = ((rateValue / 2048) * 100).toFixed(1);
+    const percentage = ((rateValue / 2048) * 100).toFixed(2);
     const imgSrc = `assets/opponent/${drop.imageId}.png`;
     const typeName = cardTypes[drop.typeIndex] || 'Unknown';
     const typeImgSrc = `assets/types/${typeName}.png`;
@@ -178,6 +179,7 @@ function applySortAndFilter() {
   const checkedStrats = [...filterStrategy.querySelectorAll('input:checked')].map(cb => cb.value);
   const checkedTypes = [...typeFilterContainer.querySelectorAll('input:checked')].map(cb => +cb.value);
 
+  // Always start by filtering from currentData (not originalData)
   let filtered = currentData.filter(drop => {
     const rateNum = parseInt(drop.rate.split('/')[0], 10);
     return drop.card.toLowerCase().includes(textFilter) &&
@@ -187,19 +189,29 @@ function applySortAndFilter() {
       checkedTypes.includes(drop.typeIndex);
   });
 
+  // Apply sort if needed
   if (currentSortKey) {
     filtered.sort((a, b) => {
-      let aVal = a[currentSortKey], bVal = b[currentSortKey];
+      let aVal = a[currentSortKey];
+      let bVal = b[currentSortKey];
+
       if (currentSortKey === 'rate') {
         aVal = parseInt(aVal.split('/')[0], 10);
         bVal = parseInt(bVal.split('/')[0], 10);
+      } else {
+        aVal = aVal.toString().toLowerCase();
+        bVal = bVal.toString().toLowerCase();
       }
-      return currentSortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+
+      if (aVal < bVal) return currentSortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return currentSortDirection === 'asc' ? 1 : -1;
+      return 0;
     });
   }
 
   renderTable(filtered);
 }
+
 
 fileInput.addEventListener('change', async e => {
   const file = e.target.files[0];
@@ -207,6 +219,7 @@ fileInput.addEventListener('change', async e => {
   await loadTypeMapping();
   const text = await file.text();
   currentData = parseDropData(text);
+  originalData = [...currentData];
   populateFilters(currentData);
   applySortAndFilter();
   searchView.classList.remove('hidden');
@@ -217,6 +230,7 @@ document.getElementById('loadVanilla').addEventListener('click', async () => {
   const res = await fetch('assets/vanilla.log');
   const text = await res.text();
   currentData = parseDropData(text);
+  originalData = [...currentData];
   populateFilters(currentData);
   applySortAndFilter();
   searchView.classList.remove('hidden');
@@ -251,16 +265,27 @@ document.getElementById('resetApp').addEventListener('click', () => {
 document.querySelectorAll('#dropsTable th').forEach(header => {
   header.addEventListener('click', () => {
     const key = header.dataset.key;
-    if (currentSortKey === key) {
-      currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
+    const isSameKey = currentSortKey === key;
+
+    if (!isSameKey) {
       currentSortKey = key;
       currentSortDirection = 'asc';
+    } else if (currentSortDirection === 'asc') {
+      currentSortDirection = 'desc';
+    } else if (currentSortDirection === 'desc') {
+      currentSortKey = null;
+      currentSortDirection = 'asc';
     }
+
+    // Remove all sort indicators
     document.querySelectorAll('#dropsTable th').forEach(h =>
       h.classList.remove('sorted-asc', 'sorted-desc')
     );
-    header.classList.add(`sorted-${currentSortDirection}`);
+
+    if (currentSortKey) {
+      header.classList.add(`sorted-${currentSortDirection}`);
+    }
+
     applySortAndFilter();
   });
 });
