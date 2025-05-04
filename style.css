@@ -1,68 +1,64 @@
 /* Base styles */
 body {
   margin: 0;
-  font-family: sans-serif;
+  font-family: 'Segoe UI', Roboto, sans-serif;
   background: #121212;
   color: #e0e0e0;
+  line-height: 1.6;
 }
 
 /* Layout container */
 .container {
-  max-width: 900px;
+  max-width: 960px;
   margin: auto;
-  padding: 20px;
+  padding: 20px 20px;
 }
 
-/* Form controls */
-input,
-select {
-  background: #1e1e1e;
-  color: #fff;
-  padding: 10px;
-  border: none;
-  margin-bottom: 2px;
-}
-
-input[type="search"] {
-  width: 100%;
-  margin: 10px 0;
-  background: #222;
-  border: 1px solid #444;
-}
-
-/* Upload row */
+/* File upload row */
 .file-upload-row {
-  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-#loadVanilla {
-  margin-left: 10px;
-  padding: 10px 14px;
+/* Unified button + label styling */
+button,
+.button-like {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
   background: #2a2a2a;
   color: #fff;
-  border: 1px solid #444;
   cursor: pointer;
-  font-size: 1em;
-  transition: background 0.2s ease;
+  font-size: 0.95em;
+  font-family: inherit;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+  user-select: none;
 }
 
-#loadVanilla:hover {
-  background: #3a3a3a;
+button:hover,
+.button-like:hover {
+  background: #444;
+}
+
+#toggleTypeDropdown:hover {
+  background: #2a2a2a;
 }
 
 #resetApp {
-  margin-left: 10px;
-  padding: 10px 14px;
-  background: #2a2a2a;
-  color: #ff0000;
-  border: 1px solid #444;
-  cursor: pointer;
-  font-size: 1em;
-  transition: background 0.2s ease;
+  color: #ff5252;
 }
 
-#resetApp:hover {
-  background: #3a3a3a;
+/* Hide native file input */
+input[type="file"] {
+  display: none;
 }
 
 /* Search bar */
@@ -70,46 +66,72 @@ input[type="search"] {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
-.search-bar-row input[type="search"] {
+input[type="search"] {
   flex: 1;
-  margin: 0;
+  background: #1e1e1e;
+  color: #e0e0e0;
+  padding: 10px 12px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  transition: border 0.2s ease;
 }
 
-/* Filter section */
+input[type="search"]:focus {
+  border-color: #888;
+  outline: none;
+}
+
+/* Filters – horizontal and compact */
 .filters {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  font-size: 0.85em;
 }
 
-.filters > * {
-  flex: none;
+.filters input,
+.filters select {
+  background: #1e1e1e;
+  color: #fff;
+  padding: 4px 8px;
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-size: 0.85em;
+  width: 160px;
+  height: 32px;
+  box-sizing: border-box;
 }
 
-/* Strategy checkboxes */
+/* Strategy checkboxes - horizontal, bold, aligned */
 .strategy-checkboxes {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
   align-items: center;
-  flex: 2;
+  gap: 12px;
+  margin-left: 10px;
 }
 
 .strategy-checkboxes label {
   display: flex;
   align-items: center;
   gap: 4px;
+  font-size: 0.85em;
+  font-weight: bold;
+  line-height: 1;
+  white-space: nowrap;
+  height: 16px;
 }
 
-/* Rate input widths */
-#minRate,
-#maxRate {
-  width: 150px; /* Adjust to 80px for tighter layout */
-  flex: none;
+.strategy-checkboxes input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  accent-color: #007bff;
 }
 
 /* Dropdown styles */
@@ -118,14 +140,15 @@ input[type="search"] {
 }
 
 .type-filter-dropdown button {
-  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  border-radius: 6px;
   background: #2a2a2a;
+  padding: 10px;
   color: #fff;
   border: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .type-filter-dropdown button:hover {
@@ -133,19 +156,21 @@ input[type="search"] {
 }
 
 #typeArrow {
-  font-size: 0.9em;
+  font-size: 0.85em;
 }
 
 #typeCheckboxes {
   position: absolute;
-  top: 100%;
+  top: 110%;
   left: 0;
   background: #1e1e1e;
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #444;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   max-height: 400px;
   overflow-y: auto;
-  z-index: 999;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
 }
@@ -155,29 +180,25 @@ input[type="search"] {
 }
 
 #typeCheckboxes label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 5px;
+  margin-bottom: 2px;
+  font-size: 0.9em;
 }
 
-/* Type dropdown control buttons */
 #typeCheckboxes .type-controls {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
   margin-bottom: 10px;
+  gap: 8px;
 }
 
 #typeCheckboxes .type-controls button {
-  flex: 1;
-  padding: 6px 10px;
+  padding: 6px 6px;
+  font-size: 0.85em;
+  border-radius: 6px;
   background: #2a2a2a;
-  color: #fff;
   border: 1px solid #444;
+  color: #fff;
   cursor: pointer;
-  font-size: 0.9em;
-  transition: background 0.2s ease;
 }
 
 #typeCheckboxes .type-controls button:hover {
@@ -188,20 +209,25 @@ input[type="search"] {
 table {
   width: 100%;
   border-collapse: collapse;
-}
-
-table, th, td {
-  border: 1px solid black;
+  margin-top: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  font-size: 0.9em;
 }
 
 th, td {
-  padding: 6px;
+  padding: 6px 10px;
   text-align: left;
 }
 
 th {
-  background: #333;
+  background: #222;
+  color: #fff;
+  font-weight: 600;
+  user-select: none;
   cursor: pointer;
+  border-bottom: 1px solid #444;
 }
 
 th.sorted-asc::after {
@@ -212,33 +238,30 @@ th.sorted-desc::after {
   content: ' ▼';
 }
 
-/* Table row striping */
-#dropsTable tbody tr.even {
+tbody tr:nth-child(even) {
   background-color: #1e1e1e;
 }
 
-#dropsTable tbody tr.odd {
-  background-color: #2a2a2a;
+tbody tr:nth-child(odd) {
+  background-color: #292929;
 }
 
-/* Opponent image in table */
-.opponent-cell img {
-  width: 24px;
-  height: 24px;
-  vertical-align: middle;
-  margin-right: 2px;
-  border-radius: 4px;
+/* Bold card names */
+#dropsTable tbody td:first-child {
+  font-weight: bold;
 }
 
+/* Opponent image and type icon (no rounded corners) */
+.opponent-cell img,
 .type-icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  border-radius: 0;
   vertical-align: middle;
-  margin-right: 2px;
-  border-radius: 4px;
 }
 
 /* Utility */
 .hidden {
-  display: none;
+  display: none !important;
 }

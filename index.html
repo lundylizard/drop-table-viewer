@@ -2,12 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>[FM] Drop Table Viewer</title>
+  <title>Drop Table Viewer</title>
   <link rel="stylesheet" href="style.css" />
+  <link id="favicon" rel="icon" type="image/png" href="assets/favicon/favicon_64x64.png">
+  <script>
+  const favicon = document.getElementById('favicon');
+  const img = new Image();
+  img.src = 'assets/favicon/favicon_64x64.png';
+  img.crossOrigin = 'anonymous';
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  let t = 0;
+
+  img.onload = () => {
+    canvas.width = img.width;
+    canvas.height = img.height;
+
+    setInterval(() => {
+      const brightness = 1 + 0.5 * Math.sin(t);
+      t += 0.025;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.filter = `brightness(${brightness})`;
+      ctx.drawImage(img, 0, 0);
+
+      const newFavicon = canvas.toDataURL('image/png');
+      favicon.href = newFavicon;
+    }, 1);
+  };
+  </script>
 </head>
+
 <body>
   <div class="container">
     <div class="file-upload-row">
+      <label for="logFile" class="button-like">Upload...</label>
       <input type="file" id="logFile" />
       <button id="loadVanilla">Load Vanilla</button>
       <button id="resetApp">Reset</button>
